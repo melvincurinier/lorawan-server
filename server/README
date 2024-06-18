@@ -1,0 +1,5 @@
+# Serveur NodeJS MQTT MySQL
+
+## Modules installées
+
+Express, mqtt, mysql2, dotenv, nodemon
