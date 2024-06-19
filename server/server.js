@@ -1,12 +1,12 @@
 require('dotenv').config();
 const express = require('express');
-const mySQLpool = require('./database/mysql');
+const mySQLpool = require('./config/mysql');
 
 // rest object
 const app = express();
 
 // middlewares
-// app.use(express.json());
+app.use(express.json());
 
 // routes
 app.use('/api/v1/sensor', require('./routes/sensorRoutes'));

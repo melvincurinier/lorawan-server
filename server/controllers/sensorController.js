@@ -1,4 +1,4 @@
-const mysqldb = require('../database/mysql');
+const mysqldb = require('../config/mysql');
 
 const getAllSensorsData = async (request, response) => {
     try {
