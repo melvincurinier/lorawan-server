@@ -1,5 +1,5 @@
 const express = require('express');
-const { getAllSensorsData } = require('../controllers/sensorController');
+const { getAllSensorsData, getAllDataBySensorID} = require('../controllers/sensorController');
 
 // router object
 const router = express.Router();
@@ -8,5 +8,8 @@ const router = express.Router();
 
 // GET ALL SENSORS DATA
 router.get('/getall', getAllSensorsData);
+
+// GET ALL DATA FROM A SENSOR ID
+router.get('/get/:id', getAllDataBySensorID);
 
 module.exports = router;
