@@ -18,5 +18,5 @@ app.get('/test', (request, response) => {
 });
 
 app.listen(port, () => {
-    console.log(`Server running on port ${port}`);
+    console.log('SERVER >> Server running on port ' + port);
 });

@@ -4,7 +4,16 @@ const server = require('net').createServer(aedes.handle);
 const mqtt = require('mqtt');
 
 server.listen(process.env.MQTT_PORT, () => {
-  console.log('MQTT broker started and listened on port ' + process.env.MQTT_PORT);
+  console.log('BROKER >> MQTT broker started and running on port ' + process.env.MQTT_PORT);
+});
+
+// Log des connexions et déconnexions
+aedes.on('client', (client) => {
+    console.log(`BROKER >> Client connected: ${client.id}`);
+});
+  
+aedes.on('clientDisconnect', (client) => {
+    console.log(`BROKER >> Client disconnected: ${client.id}`);
 });
 
 const mqttClient = mqtt.connect('mqtt://' + process.env.MQTT_HOSTNAME + ':' + process.env.MQTT_PORT);
@@ -12,22 +21,20 @@ const mqttClient = mqtt.connect('mqtt://' + process.env.MQTT_HOSTNAME + ':' + pr
 const topic = '#';
 
 mqttClient.on('connect', () => {
-    console.log('Connected to MQTT broker');
+    console.log('SERVER >> Connected to MQTT broker');
 
-    mqttClient.subscribe(topic, (err) => {
-        if(err) { console.log(err); }
-    });
-
-    mqttClient.on("message", (topic, message) => {
-        console.log(`MQTT Client Message.  Topic: ${topic}.  Message: ${message.toString()}`);
+    mqttClient.subscribe(topic, (error) => {
+        console.log('SERVER >> Suscribed to MQTT broker topic : ' + topic);
+        if(error) { console.log(error); }
     });
 });
 
-aedes.on('publish', async (packet, client) => {
-    const message = packet.payload.toString();
-    // Process the message and perform database operations
-    console.log(`Message received on some/topic: ${message}`);
+mqttClient.on("message", (topic, message) => {
+    const now = new Date().toLocaleTimeString();
+    console.log(`SERVER >>  MQTT Client Message ${now} - Topic: ${topic} - Message: ${message.toString()}`);
 });
+
+
 
 module.exports = { aedes, mqttClient };
 
