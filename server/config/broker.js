@@ -31,7 +31,7 @@ mqttClient.on('connect', () => {
 
 mqttClient.on("message", (topic, message) => {
     const now = new Date().toLocaleTimeString();
-    console.log(`SERVER >>  MQTT Client Message ${now} - Topic: ${topic} - Message: ${message.toString()}`);
+    console.log(`SERVER >> MQTT Client Message ${now} - Topic: ${topic} - Message: ${message.toString()}`);
 });
 
 
