@@ -7,9 +7,9 @@ const router = express.Router();
 // routes
 
 // GET ALL SENSORS DATA
-router.get('/getall', getAllSensorsData);
+router.get('/sensors', getAllSensorsData);
 
 // GET ALL DATA FROM A SENSOR ID
-router.get('/get/:id', getAllDataBySensorID);
+router.get('/sensors/:id', getAllDataBySensorID);
 
 module.exports = router;

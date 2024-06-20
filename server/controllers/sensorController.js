@@ -2,7 +2,7 @@ const mysqldb = require('../config/mysql');
 
 const getAllSensorsData = async (request, response) => {
     try {
-        const data = await mysqldb.query('SELECT * FROM sensor_data');
+        const [data] = await mysqldb.query('SELECT * FROM sensor_data');
         if(!data){
             return response.status(404).send({
                 success:false,
@@ -12,7 +12,7 @@ const getAllSensorsData = async (request, response) => {
         response.status(200).send({
             success:true,
             message:'All Sensors Records',
-            data : data[0]
+            data : data
         });
     } catch (error) {
         console.log(error);
@@ -35,7 +35,7 @@ const getAllDataBySensorID = async (request, response) => {
             });
         }
 
-        const data = await mysqldb.query('SELECT * FROM sensor_data WHERE sensor_id=?', [sensorId]);
+        const [data] = await mysqldb.query('SELECT * FROM sensor_data WHERE sensor_id=?', [sensorId]);
         if(!data){
             return response.status(404).send({
                 success:false,
@@ -45,7 +45,7 @@ const getAllDataBySensorID = async (request, response) => {
         response.status(200).send({
             success:true,
             message:'All Data Records From Sensor ID',
-            sensorData : data[0]
+            sensorData : data
         });
     } catch (error) {
         console.log(error);

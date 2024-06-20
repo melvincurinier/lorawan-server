@@ -10,10 +10,12 @@
   "author": "melvincurinier",
   "license": "ISC",
   "dependencies": {
+    "aedes": "^0.51.2",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "mqtt": "^5.7.1",
     "mysql2": "^3.10.1",
+    "net": "^1.0.2",
     "nodemon": "^3.1.3"
   }
 }

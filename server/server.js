@@ -1,30 +1,22 @@
 require('dotenv').config();
 const express = require('express');
-const mySQLpool = require('./config/mysql');
+const mysqldb = require('./config/mysql');
+const { aedes, mqttClient } = require('./config/broker');
 
 // rest object
 const app = express();
+const port = 8080;
 
 // middlewares
 app.use(express.json());
 
 // routes
-app.use('/api/v1/sensor', require('./routes/sensorRoutes'));
+app.use('/api/v1', require('./routes/sensorRoutes'));
 
-app.get('/test', (req, res) => {
-    res.status(200).send('<h1>Nodejs server</h1>');
+app.get('/test', (request, response) => {
+    response.status(200).send('<h1>Nodejs server</h1>');
 });
 
-// conditionaly listen
-mySQLpool.query('SELECT 1').then(()=>{
-    // MySQL
-    console.log('MySQL Database Connected...');
-
-    // listen
-    app.listen(process.env.SERVER_PORT, () => {
-        console.log('Server running on port ' + process.env.SERVER_PORT);
-    });
-}).catch((err)=>{
-    console.log(err);
-})
-
+app.listen(port, () => {
+    console.log(`Server running on port ${port}`);
+});
