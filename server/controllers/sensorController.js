@@ -1,7 +1,5 @@
 const sensorService = require('../services/sensorService');
 
-// API
-
 // GET ALL DATA FROM SENSORS
 const getAllSensorsData = async (request, response) => {
     try {
@@ -61,29 +59,15 @@ const getAllDataBySensorID = async (request, response) => {
 };
 
 // ADD DATA SENSOR
-const addDataSensorByID = async (request, response) => {
+const addDataSensorByID = async (sensorId, data) => {
     try {
-        const { sensorId, data } = request.body;
         if (!sensorId || !data) {
-            return response.status(400).send({
-            success: false,
-            message: 'Invalid Or Provide Sensor ID or Data'
-            });
+            console.log('Invalid Or Provide Sensor ID or Data');
+            return;
         }
-
         await sensorService.addDataSensorToDatabase(sensorId, data);
-
-        response.status(200).send({
-            success: true,
-            message: 'Data added successfully'
-        });
     } catch (error) {
-        console.log(error);
-        response.status(500).send({
-            success: false,
-            message: 'Error in Add Data Sensor API',
-            error
-        });
+        throw error;
     }
 };
 
