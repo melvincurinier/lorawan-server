@@ -3,6 +3,7 @@ const express = require('express');
 const mysqldb = require('./config/mysql');
 const { aedes } = require('./config/broker');
 const mqtt = require('mqtt');
+const { addDataSensorToDatabase } = require('./services/sensorService');
 
 // rest object
 const app = express();
@@ -41,6 +42,17 @@ mqttClient.on('connect', () => {
 mqttClient.on("message", (topic, message) => {
     const now = new Date().toLocaleTimeString();
     console.log(`SERVER >> MQTT Client Message ${now} - Topic: ${topic} - Message: ${message.toString()}`);
+
+    try{
+        const [ clientId, sensorId, topicName ] = topic.split('/');
+        const data = JSON.parse(message.toString());
+        
+        addDataSensorToDatabase(sensorId, data);
+
+        console.log('SERVER >> Data from sensor ' + sensorId + ' added to database');
+    } catch (error) {
+        console.error('SERVER >> Error processing Add Data Sensor to database:', error);
+    }
 });
 
 mqttClient.on('packetsend', (packet) => {
