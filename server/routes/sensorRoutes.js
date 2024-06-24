@@ -12,7 +12,4 @@ router.get('/sensors', getAllSensorsData);
 // GET ALL DATA FROM SENSOR ID
 router.get('/sensors/:id', getAllDataBySensorID);
 
-// ADD DATA SENSOR
-// router.post('/sensors/:id', addDataSensorByID);
-
 module.exports = router;
