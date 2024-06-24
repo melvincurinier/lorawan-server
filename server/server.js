@@ -15,18 +15,14 @@ app.use(express.json());
 // routes
 app.use('/api/v1', require('./routes/sensorRoutes'));
 
-app.get('/test', (request, response) => {
-    response.status(200).send('<h1>Nodejs server</h1>');
-});
-
 app.listen(port, () => {
     console.log('SERVER >> Server running on port ' + port);
 });
 
 const mqttClient = mqtt.connect('mqtt://' + process.env.MQTT_HOSTNAME + ':' + process.env.MQTT_PORT);
 
-const topic = '#';
-const qos = 1;
+const topic = process.env.MQTT_TOPIC;
+const qos = process.env.MQTT_QOS;
 
 mqttClient.on('connect', () => {
     console.log('SERVER >> Connected to MQTT broker');
