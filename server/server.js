@@ -22,7 +22,7 @@ app.listen(port, () => {
 const mqttClient = mqtt.connect('mqtt://' + process.env.MQTT_HOSTNAME + ':' + process.env.MQTT_PORT);
 
 const topic = process.env.MQTT_TOPIC;
-const qos = process.env.MQTT_QOS;
+const qos = parseInt(process.env.MQTT_QOS);
 
 mqttClient.on('connect', () => {
     console.log('SERVER >> Connected to MQTT broker');
