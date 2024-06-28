@@ -12,6 +12,11 @@ const port = 8080;
 // middlewares
 app.use(express.json());
 
+app.use((error, request, response, next) => {
+    console.error(error.stack);
+    response.status(500).send('Something broke !');
+})
+
 // routes
 app.use('/api/v1', require('./routes/sensorRoutes'));
 
@@ -57,6 +62,7 @@ mqttClient.on('packetsend', (packet) => {
     }
 });
 
-mqttClient.on('error', (err) => {
-    console.error('SERVER >> Connection error:', err);
+mqttClient.on('error', (error) => {
+    console.error('SERVER >> MQTT Client error:', error);
+    process.exit(1);
 });

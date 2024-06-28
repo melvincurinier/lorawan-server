@@ -13,7 +13,7 @@ const getAllSensorsDataFromDatabase = async () => {
 
 // GET ALL DATA SENSORS
 const getAllDataBySensorIDFromDatabase = async (sensorId) => {
-    const query = 'SELECT * FROM sensor_data WHERE sensor_id=?';
+    const query = 'SELECT * FROM sensor_data WHERE sensor_dev_addr=?';
     const values = [sensorId];
     try {
         const result = await mysqldb.query(query, values);
@@ -25,7 +25,7 @@ const getAllDataBySensorIDFromDatabase = async (sensorId) => {
 
 // ADD DATA SENSOR TO DATABASE
 const addDataSensorToDatabase = async (sensorId, data) => {
-    const query = 'INSERT INTO sensor_data (sensor_id, tempC_SHT, hum_SHT, tempC_DS) VALUES (?, ?, ?, ?)';
+    const query = 'INSERT INTO sensor_data (sensor_dev_addr, tempC_SHT, hum_SHT, tempC_DS) VALUES (?, ?, ?, ?)';
     const { TempC_SHT, Hum_SHT, TempC_DS } = data;
     const values = [sensorId, TempC_SHT, Hum_SHT, TempC_DS];
     try {
