@@ -1,7 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const mysqldb = require('./config/mysql');
-const { aedes } = require('./config/broker');
+
 const mqtt = require('mqtt');
 const { addDataSensorByID } = require('./controllers/sensorController');
 
@@ -45,12 +45,12 @@ mqttClient.on("message", (topic, message) => {
     console.log(`SERVER >> MQTT Client Message ${now} - Topic: ${topic} - Message: ${message.toString()}`);
 
     try{
-        const [ clientId, sensorId, topicName ] = topic.split('/');
+        const [ topicName, channel ] = topic.split('/');
         const data = JSON.parse(message.toString());
         
-        addDataSensorByID(sensorId, data);
+        addDataSensorByID(channel, data);
 
-        console.log('SERVER >> Data from sensor ' + sensorId + ' added to database');
+        console.log('SERVER >> Data from channel ' + channel + ' subscribed to ' + topicName + ' added to database');
     } catch (error) {
         console.error('SERVER >> Error processing Add Data Sensor to database:', error);
     }
