@@ -1,5 +1,5 @@
 const express = require('express');
-const { getAllSensorsData, getAllDataBySensorID, addDataSensorByID} = require('../controllers/sensorController');
+const { getAllSensorsData, getAllDataBySensorID } = require('../controllers/sensorController');
 
 // router object
 const router = express.Router();
