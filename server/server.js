@@ -6,6 +6,8 @@ const express = require('express');
 const mqtt = require('mqtt');
 const { addDataSensorByID } = require('./controllers/sensorController');
 
+const { coloredLog, coloredErrorLog } = require('./util/coloredLog');
+
 // rest object
 const app = express();
 
@@ -21,7 +23,7 @@ app.use((error, request, response, next) => {
 app.use('/api/v1', require('./routes/sensorRoutes'));
 
 app.listen(process.env.SERVER_PORT, () => {
-    console.log('SERVER >> Server running on port ' + process.env.SERVER_PORT);
+    coloredLog(`SERVER >> Server running on port ${process.env.SERVER_PORT}`, 'green');
 });
 
 const clientId = 'mqtt_server';
@@ -36,19 +38,19 @@ const topic = process.env.MQTT_TOPIC;
 const qos = parseInt(process.env.MQTT_QOS);
 
 mqttClient.on('connect', () => {
-    console.log('SERVER >> Connected to MQTT broker');
+    coloredLog('SERVER >> Connected to MQTT broker', 'green');
     mqttClient.subscribe(topic, { qos: qos }, (error) => {
         if(!error) { 
-            console.log('SERVER >> Suscribed QoS ' + qos + ' to MQTT broker topic : ' + topic);
+            coloredLog(`SERVER >> Suscribed QoS ${qos} to MQTT broker topic : ${topic}`, 'green');
         } else {
-            console.log('SERVER >> ' + error);
+            coloredErrorLog(`SERVER >> ${error}`, 'green');
         }
     });
 });
 
 mqttClient.on("message", (topic, message) => {
     const now = new Date().toLocaleTimeString();
-    console.log(`SERVER >> MQTT Client Message ${now} - Topic: ${topic} - Message: ${message.toString()}`);
+    coloredLog(`SERVER >> MQTT Client Message ${now} - Topic: ${topic} - Message: ${message.toString()}`, 'green');
 
     try{
         const [ topicName, channel ] = topic.split('/');
@@ -56,19 +58,19 @@ mqttClient.on("message", (topic, message) => {
         
         addDataSensorByID(channel, data);
 
-        console.log('SERVER >> Data from channel ' + channel + ' subscribed to ' + topicName + ' added to database');
+        coloredLog(`SERVER >> Data from channel ${channel} subscribed to ${topicName} added to database`, 'green');
     } catch (error) {
-        console.error('SERVER >> Error processing Add Data Sensor to database:', error);
+        coloredErrorLog(`SERVER >> Error processing Add Data Sensor to database: ${error}`, 'green');
     }
 });
 
 mqttClient.on('packetsend', (packet) => {
     if (packet.cmd === 'puback') {
-        console.log('SERVER >> QoS 1 message acknowledged');
+        coloredLog('SERVER >> QoS 1 message acknowledged', 'green');
     }
 });
 
 mqttClient.on('error', (error) => {
-    console.error('SERVER >> MQTT Client error:', error);
+    coloredErrorLog(`SERVER >> MQTT Client error: ${error}`, 'green');
     process.exit(1);
 });
