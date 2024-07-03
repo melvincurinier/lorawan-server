@@ -1,13 +1,13 @@
 require('dotenv').config();
-const express = require('express');
-const mysqldb = require('./config/mysql');
+require('./config/mysql');
+require('./config/broker');
 
+const express = require('express');
 const mqtt = require('mqtt');
 const { addDataSensorByID } = require('./controllers/sensorController');
 
 // rest object
 const app = express();
-const port = 8080;
 
 // middlewares
 app.use(express.json());
@@ -20,11 +20,17 @@ app.use((error, request, response, next) => {
 // routes
 app.use('/api/v1', require('./routes/sensorRoutes'));
 
-app.listen(port, () => {
-    console.log('SERVER >> Server running on port ' + port);
+app.listen(process.env.SERVER_PORT, () => {
+    console.log('SERVER >> Server running on port ' + process.env.SERVER_PORT);
 });
 
-const mqttClient = mqtt.connect('mqtt://' + process.env.MQTT_HOSTNAME + ':' + process.env.MQTT_PORT);
+const clientId = 'mqtt_server';
+
+const mqttClient = mqtt.connect('mqtt://' + process.env.MQTT_HOSTNAME + ':' + process.env.MQTT_PORT, {
+    clientId,
+    username: process.env.AEDES_AUTH_USERNAME,
+    password: process.env.AEDES_AUTH_PASSWORD
+});
 
 const topic = process.env.MQTT_TOPIC;
 const qos = parseInt(process.env.MQTT_QOS);

@@ -1,11 +1,29 @@
-require('dotenv').config();
-const aedes = require('aedes')();
-const server = require('net').createServer(aedes.handle);
+require('dotenv').config({ path: '../.env' });
 
-const port = 1883;
-
-server.listen(port, () => {
-  console.log('MQTT broker started and listening on port ' + port);
+const aedes = require('aedes')({
+  concurrency: process.env.CONCURRENCY || 10000,
+  queueLimit: process.env.QUEUE_LIMIT || 100,
+  connectTimeout: process.env.CONNECTION_TIMEOUT || 30000,
+  clean: false,
+  authenticate: (client, username, password, callback) => {
+    let passwordToString = '';
+    if(password) passwordToString = password.toString();
+    if (process.env.AEDES_AUTH_USERNAME && process.env.AEDES_AUTH_PASSWORD) {
+      if (username === process.env.AEDES_AUTH_USERNAME && passwordToString === process.env.AEDES_AUTH_PASSWORD) {
+        console.log("Client Authenticated", client.id);
+        callback(null, true);
+        return;
+      }
+      console.log("Client Not Authenticated", client.id);
+      const error = new Error("Auth error");
+      error.returnCode = 4;
+      callback(error, null);
+      return;
+    }
+    console.log("Zero Auth", client.id);
+    callback(null, true);
+    return;
+  }
 });
 
 // emitted when a client connects to the broker
@@ -30,8 +48,18 @@ aedes.on('unsubscribe', function (subscriptions, client) {
 
 // emitted when a client publishes a message packet on the topic
 aedes.on('publish', function (packet, client) {if (client) {
-  console.log(`MESSAGE_PUBLISHED : MQTT Client ${(client ? client.id : 'AEDES BROKER_' + aedes.id)} has published message "${packet.payload.devadrr}" on ${packet.topic} to aedes broker ${aedes.id}`)}
+  console.log(`MESSAGE_PUBLISHED : MQTT Client ${(client ? client.id : 'AEDES BROKER_' + aedes.id)} has published message "${packet.payload}" on ${packet.topic} to aedes broker ${aedes.id}`)}
 })
 
-module.exports = { aedes };
+if(!aedes.id){
+  console.log('Aedes not initialized');
+  return;
+}
 
+console.log("Aedes initialized: id", aedes.id);
+
+const server = require('net').createServer(aedes.handle);
+
+server.listen(process.env.MQTT_PORT, () => {
+  console.log('MQTT broker started and listening on port ' + process.env.MQTT_PORT);
+});
