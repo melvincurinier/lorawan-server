@@ -1,6 +1,6 @@
 const mysql = require('mysql2/promise');
 
-const { coloredLog, coloredErrorLog } = require('../util/coloredLog');
+const { logDatabase } = require('../util/coloredLog');
 
 const mysqldb = mysql.createPool({
     host: process.env.MYSQL_HOSTNAME,
@@ -15,16 +15,16 @@ const mysqldb = mysql.createPool({
 async function checkConnection() {
     try{
         const connection = await mysqldb.getConnection();
-        coloredLog('DATABASE >> Connected to server', 'red');
+        logDatabase('Connected to server', false);
         connection.release();
     } catch (error) {
         if (error.code === 'PROTOCOL_CONNECTION_LOST') {
-            coloredErrorLog('DATABASE >> Database connection was closed', 'red');
+            logDatabase('Database connection was closed', true);
         } else if (error.code === 'ER_CON_COUNT_ERROR') {
-            coloredErrorLogr('DATABASE >> Database has too many connections', 'red');
+            logDatabase('Database has too many connections', true);
         }
         if (error.code === 'ECONNREFUSED') {
-            coloredErrorLog('DATABASE >> Database connection was refused', 'red');
+            logDatabase('Database connection was refused', true);
         }
     }
 }

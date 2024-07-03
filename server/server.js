@@ -6,7 +6,7 @@ const express = require('express');
 const mqtt = require('mqtt');
 const { addDataSensorByID } = require('./controllers/sensorController');
 
-const { coloredLog, coloredErrorLog } = require('./util/coloredLog');
+const { logServer } = require('./util/coloredLog');
 
 // rest object
 const app = express();
@@ -23,7 +23,7 @@ app.use((error, request, response, next) => {
 app.use('/api/v1', require('./routes/sensorRoutes'));
 
 app.listen(process.env.SERVER_PORT, () => {
-    coloredLog(`SERVER >> Server running on port ${process.env.SERVER_PORT}`, 'green');
+    logServer(`Server running on port ${process.env.SERVER_PORT}`, false);
 });
 
 const clientId = 'mqtt_server';
@@ -38,33 +38,33 @@ const topic = process.env.MQTT_TOPIC;
 const qos = parseInt(process.env.MQTT_QOS);
 
 mqttClient.on('connect', () => {
-    coloredLog('SERVER >> Connected to MQTT broker', 'green');
+    logServer('Connected to MQTT broker', false);
     mqttClient.subscribe(topic, { qos: qos }, (error) => {
         if(!error) { 
-            coloredLog(`SERVER >> Suscribed QoS ${qos} to MQTT broker topic : ${topic}`, 'green');
+            logServer(`Suscribed QoS ${qos} to MQTT broker topic : ${topic}`, false);
         } else {
-            coloredErrorLog(`SERVER >> ${error}`, 'green');
+            logServer(`${error}`, true);
         }
     });
 });
 
 mqttClient.on("message", (topic, message) => {
     const now = new Date().toLocaleTimeString();
-    coloredLog(`SERVER >> MQTT Client Message ${now} - Topic: ${topic} - Message: ${message.toString()}`, 'green');
+    logServer(`MQTT Client Message ${now} - Topic: ${topic} - Message: ${message.toString()}`, false);
 
     const [ topicName, channel ] = topic.split('/');
     const data = JSON.parse(message.toString());
     addDataSensorByID(channel, data);
-    coloredLog(`SERVER >> Data from channel ${channel} subscribed to ${topicName} added to database`, 'green');
+    logServer(`Data from channel ${channel} subscribed to ${topicName} added to database`, false);
 });
 
 mqttClient.on('packetsend', (packet) => {
     if (packet.cmd === 'puback') {
-        coloredLog('SERVER >> QoS 1 message acknowledged', 'green');
+        logServer('QoS 1 message acknowledged', false);
     }
 });
 
 mqttClient.on('error', (error) => {
-    coloredErrorLog(`SERVER >> MQTT Client error: ${error}`, 'green');
+    logServer(`MQTT Client error: ${error}`, true);
     process.exit(1);
 });
