@@ -23,16 +23,16 @@ app.use((error, request, response, next) => {
 app.use('/api/v1', require('./routes/sensorRoutes'));
 
 app.listen(process.env.SERVER_PORT, () => {
-    logServer(`Server running on port ${process.env.SERVER_PORT}`, false);
+    logServer(`Server ${process.env.SERVER_ID} running on port ${process.env.SERVER_PORT}`, false);
 });
 
-const clientId = 'mqtt_server';
-
-const mqttClient = mqtt.connect('mqtt://' + process.env.MQTT_HOSTNAME + ':' + process.env.MQTT_PORT, {
-    clientId,
+const options = {
+    clientId: process.env.SERVER_ID,
     username: process.env.AEDES_AUTH_USERNAME,
-    password: process.env.AEDES_AUTH_PASSWORD
-});
+    password: process.env.AEDES_AUTH_PASSWORD,
+    clean: false,
+}
+const mqttClient = mqtt.connect('mqtt://' + process.env.MQTT_HOSTNAME + ':' + process.env.MQTT_PORT, options);
 
 const topic = process.env.MQTT_TOPIC;
 const qos = parseInt(process.env.MQTT_QOS);

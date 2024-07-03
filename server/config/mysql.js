@@ -15,7 +15,7 @@ const mysqldb = mysql.createPool({
 async function checkConnection() {
     try{
         const connection = await mysqldb.getConnection();
-        logDatabase('Connected to server', false);
+        logDatabase('Database connection established', false);
         connection.release();
     } catch (error) {
         if (error.code === 'PROTOCOL_CONNECTION_LOST') {

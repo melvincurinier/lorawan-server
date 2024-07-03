@@ -3,10 +3,10 @@ require('dotenv').config({ path: '../.env' });
 const { logBroker } = require('../util/coloredLog');
 
 const aedes = require('aedes')({
+  id: process.env.AEDES_ID,
   concurrency: process.env.CONCURRENCY || 10000,
   queueLimit: process.env.QUEUE_LIMIT || 100,
   connectTimeout: process.env.CONNECTION_TIMEOUT || 30000,
-  clean: false,
   authenticate: (client, username, password, callback) => {
     let passwordToString = '';
     if(password) passwordToString = password.toString();
