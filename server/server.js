@@ -52,16 +52,10 @@ mqttClient.on("message", (topic, message) => {
     const now = new Date().toLocaleTimeString();
     coloredLog(`SERVER >> MQTT Client Message ${now} - Topic: ${topic} - Message: ${message.toString()}`, 'green');
 
-    try{
-        const [ topicName, channel ] = topic.split('/');
-        const data = JSON.parse(message.toString());
-        
-        addDataSensorByID(channel, data);
-
-        coloredLog(`SERVER >> Data from channel ${channel} subscribed to ${topicName} added to database`, 'green');
-    } catch (error) {
-        coloredErrorLog(`SERVER >> Error processing Add Data Sensor to database: ${error}`, 'green');
-    }
+    const [ topicName, channel ] = topic.split('/');
+    const data = JSON.parse(message.toString());
+    addDataSensorByID(channel, data);
+    coloredLog(`SERVER >> Data from channel ${channel} subscribed to ${topicName} added to database`, 'green');
 });
 
 mqttClient.on('packetsend', (packet) => {
