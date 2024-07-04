@@ -23,7 +23,7 @@ app.use(express.json());
 // Error handling middleware
 app.use((error, request, response, next) => {
     console.error(error.stack); // Log the error stack trace
-    response.status(500).send('Something broke !'); // Send a 500 response with a message
+    response.status(500).send('Internal Server Error'); // Send a 500 response with a message
 })
 
 // Use the sensor routes for any routes starting with /api/v1
