@@ -55,7 +55,6 @@ mqttClient.on("message", (topic, message) => {
     const [ topicName, channel ] = topic.split('/');
     const data = JSON.parse(message.toString());
     addDataSensorByID(channel, data);
-    logServer(`Data from channel ${channel} subscribed to ${topicName} added to database`, false);
 });
 
 mqttClient.on('packetsend', (packet) => {

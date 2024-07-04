@@ -36,7 +36,7 @@ function coloredErrorLog(prefix, message, color) {
  * A function that log database messages or errors
  */
 function logDatabase(message, error) {
-    if(error) coloredErrorLog('DATABASE >> ', message, 'green');
+    if(error) coloredErrorLog('DATABASE >> ', message, 'red');
     else coloredLog('DATABASE >> ', message, 'green');
 }
 
@@ -44,7 +44,7 @@ function logDatabase(message, error) {
  * A function that log broker messages or errors
  */
 function logBroker(message, error) {
-    if(error) coloredErrorLog('BROKER >> ', message, 'cyan');
+    if(error) coloredErrorLog('BROKER >> ', message, 'red');
     else coloredLog('BROKER >> ', message, 'cyan');
 }
 
@@ -52,7 +52,7 @@ function logBroker(message, error) {
  * A function that log server messages or errors
  */
 function logServer(message, error) {
-    if(error) coloredErrorLog('SERVER >> ', message, 'yellow');
+    if(error) coloredErrorLog('SERVER >> ', message, 'red');
     else coloredLog('SERVER >> ', message, 'yellow');
 }
 
