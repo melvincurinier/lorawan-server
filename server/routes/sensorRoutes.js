@@ -1,3 +1,4 @@
+// Import modules
 const express = require('express');
 const { getAllSensorsData, getAllDataBySensorID } = require('../controllers/sensorController');
 

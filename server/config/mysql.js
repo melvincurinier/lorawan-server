@@ -1,5 +1,5 @@
+// Import modules
 const mysql = require('mysql2/promise');
-
 const { logDatabase } = require('../util/coloredLog');
 
 // Create a connection pool to the MySQL database
