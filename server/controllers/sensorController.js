@@ -80,8 +80,14 @@ const addDataSensorByID = async (sensorId, data) => {
     try {
         if (!sensorId || !data) {
             // If no sensor ID or data are provided, throw the error
-            throw new Error('Invalid Or Provide Sensor ID or Data');
+            throw new Error('Provide Sensor ID or Data');
         }
+
+        if (!isValidSensorData(data)) {
+            // If the data does contain invalid data, throw the error
+            throw new Error('Invalid data format');
+        }
+
         // Add the sensor data to the database
         await sensorService.addDataSensorToDatabase(sensorId, data);
         logServer(`Data added to database`, false);
@@ -90,6 +96,14 @@ const addDataSensorByID = async (sensorId, data) => {
         logServer(error, true);
         logServer('Data not added to database', true);
     }
+};
+
+/**
+ * A function that validate if the data contains the required keys
+ */
+const isValidSensorData = (data) => {
+    const requiredKeys = ['Hum_SHT', 'TempC_DS', 'TempC_SHT'];
+    return requiredKeys.every(key => key in data);
 };
 
 // Export the controller functions for use in other modules
