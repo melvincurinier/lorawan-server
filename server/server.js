@@ -7,6 +7,9 @@ require('./config/mysql');
 // Initialize MQTT broker
 require('./config/broker');
 
+// Initialize FTP server
+require('./config/ftp');
+
 // Import modules
 const express = require('express');
 const mqtt = require('mqtt');
