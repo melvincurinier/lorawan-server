@@ -1,5 +1,6 @@
 const FtpSrv = require('ftp-srv');
 const fs = require('fs');
+const path = require('path');
 
 const { networkInterfaces } = require('os');
 const { Netmask } = require('netmask');
@@ -34,7 +35,6 @@ const ftp_port = process.env.FTP_PORT;
 
 const ftpServer = new FtpSrv({
   url: `ftp://${ftp_url}:${ftp_port}`,
-  anonymous: true,
   pasv_url: resolverFunction
 });
 
@@ -45,6 +45,19 @@ ftpServer.on('login', ({ connection, username, password }, resolve, reject) => {
   } else {
     reject(new Error('Invalid username or password'));
   }
+
+  connection.on('STOR', (error, stream) => { 
+    if(error){
+      console.error('Error storing file: ', error);
+      return;
+    }
+    console.log(`File stored : ${stream}`);
+  });
+});
+
+ftpServer.on('disconnect', ({connection}) => {
+  const username = connection.username;
+  console.log(`User ${username} disconnected`);
 });
 
 ftpServer.on('error', (error) => {
