@@ -4,31 +4,29 @@ const fs = require('fs');
 const { networkInterfaces } = require('os');
 const { Netmask } = require('netmask');
 
-const nets = networkInterfaces();
+
+
 function getNetworks() {
-   let networks = {};
-   for (const name of Object.keys(nets)) {
-       for (const net of nets[name]) {
-           if (net.family === 'IPv4' && !net.internal) {
-               networks[net.address + "/24"] = net.address
-           }
-       }
-   }
-   return networks;
+  const nets = networkInterfaces();
+  let networks = {};
+  for (const name of Object.keys(nets)) {
+      for (const net of nets[name]) {
+          if (net.family === 'IPv4' && !net.internal) {
+              networks[net.address + "/24"] = net.address
+          }
+      }
+  }
+  return networks;
 }
 
 const resolverFunction = (address) => {
-   // const networks = {
-   //     '$GATEWAY_IP/32': `${public_ip}`, 
-   //     '10.0.0.0/8'    : `${lan_ip}`
-   // } 
-   const networks = getNetworks();
-   for (const network in networks) {
-       if (new Netmask(network).contains(address)) {
-           return networks[network];
-       }
-   }
-   return "127.0.0.1";
+  const networks = getNetworks();
+  for (const network in networks) {
+      if (new Netmask(network).contains(address)) {
+          return networks[network];
+      }
+  }
+  return "127.0.0.1";
 }
 
 const ftp_url = process.env.FTP_HOSTNAME;
@@ -41,13 +39,12 @@ const ftpServer = new FtpSrv({
 });
 
 ftpServer.on('login', ({ connection, username, password }, resolve, reject) => {
-  if (username === 'user' && password === 'password') {
+  if (username === process.env.FTP_AUTH_USERNAME && password === process.env.FTP_AUTH_PASSWORD) {
     resolve({ root: './data' }); // Répertoire racine pour les utilisateurs autorisés
     console.log(`User ${username} logged in`);
   } else {
     reject(new Error('Invalid username or password'));
   }
-  
 });
 
 ftpServer.on('error', (error) => {
