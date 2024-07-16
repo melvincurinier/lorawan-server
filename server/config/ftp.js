@@ -5,7 +5,7 @@ const path = require('path');
 const { networkInterfaces } = require('os');
 const { Netmask } = require('netmask');
 
-
+const { parseCSV } = require('../controllers/ftpController');
 
 function getNetworks() {
   const nets = networkInterfaces();
@@ -46,12 +46,19 @@ ftpServer.on('login', ({ connection, username, password }, resolve, reject) => {
     reject(new Error('Invalid username or password'));
   }
 
-  connection.on('STOR', (error, stream) => { 
+  connection.on('STOR', async (error, stream) => { 
     if(error){
       console.error('Error storing file: ', error);
       return;
     }
     console.log(`File stored : ${stream}`);
+
+    try{
+      
+    } catch (error) {
+      console.error('Error processing CSV file:', error);
+    }
+    
   });
 });
 
@@ -71,3 +78,6 @@ ftpServer.listen()
   .catch(error => {
     console.error(`Error starting FTP server: ${error.message}`);
   });
+
+const results = parseCSV("./data/ftp/DATA/SITE_1810C4_I_30@9_Index_2024-07-15_13-45-00_2024-07-15_13-55-00_UTC0-00.csv");
+console.log('Parsed CSV results:', results);
