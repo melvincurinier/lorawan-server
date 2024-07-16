@@ -1,16 +1,19 @@
 const fs = require('fs');
-const csv = require('csv-parser');
-
-
+const { parse } = require('csv-parse');
 
 const parseCSV = (filePath) => {
   return new Promise((resolve, reject) => {
     const results = [];
 
     fs.createReadStream(filePath, 'utf-8')
-      .pipe(csv({ separator: ','}))
+      .pipe(parse({ 
+        delimiter: ',', 
+        columns: true,
+        record_delimiter: ',\r',
+        relax_column_count_more: true,
+        skip_empty_lines: true
+      }))
       .on('data', (row) => {
-        delete row[''];
         results.push(row);
       })
       .on('end', () => {
