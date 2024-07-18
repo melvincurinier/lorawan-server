@@ -1,6 +1,32 @@
 // Import modules
 const fs = require('fs');
 const { parse } = require('csv-parse');
+const ftpService = require('../services/ftpService');
+
+const addSocomecDataFromStream = async (stream) => {
+  const data = await parseCSV(stream);
+  try {
+    if (!data) {
+        // If no data are provided, throw the error
+        throw new Error('Provide Sensor ID or Data');
+    }
+
+    if (!isValidSocomecData(data)) {
+        // If the data does contain invalid data, throw the error
+        throw new Error('Invalid data format');
+    }
+
+    // Add the sensor data to the database
+    for(const row of data){
+      await ftpService.addSocomecDataToDatabase(row);
+    }
+    logServer(`Data added to database`, false);
+  } catch (error) {
+      // Log the error if adding data to the database fails
+      logServer(error, true);
+      logServer('Data not added to database', true);
+  }
+};
 
 /**
  * A function that parse a CSV file and return the data.
@@ -36,5 +62,13 @@ const parseCSV = (filePath) => {
   });
 };
 
+/**
+ * A function that validate if the data contains the required keys
+ */
+const isValidSocomecData = (data) => {
+  const requiredKeys = ['Data Key', 'Local DateTime', 'Value'];
+  return requiredKeys.every(key => key in data);
+};
+
 // Export the functions for use in other modules
-module.exports = { parseCSV };
+module.exports = { addSocomecDataFromStream };

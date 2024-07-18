@@ -56,7 +56,7 @@ ftpServer.on('login', ({ connection, username, password }, resolve, reject) => {
     }
     console.log(`File stored: ${stream}`);
 
-    const results = await parseCSV(stream);
+    await addSocomecDataFromStream(stream);
     
   });
 });
