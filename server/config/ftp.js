@@ -3,6 +3,7 @@ const FtpSrv = require('ftp-srv');
 const { networkInterfaces } = require('os');
 const { Netmask } = require('netmask');
 const { addSocomecDataFromStream } = require('../controllers/socomecFtpController');
+const { logFTP } = require('../util/coloredLog');
 
 /**
  * A function that get network interfaces and their addresses
@@ -33,9 +34,13 @@ const resolverFunction = (address) => {
   return "127.0.0.1"; // Return localhost if no match
 }
 
+// FTP config
+const ftp_url = process.env.FTP_HOSTNAME;
+const ftp_port = process.env.FTP_PORT;
+
 // Create a new FTP server instance
 const ftpServer = new FtpSrv({
-  url: `ftp://${process.env.FTP_HOSTNAME}:${process.env.FTP_PORT}`,
+  url: `ftp://${ftp_url}:${ftp_port}`,
   pasv_url: resolverFunction // Passive mode URL resolver function
 });
 
@@ -43,7 +48,7 @@ const ftpServer = new FtpSrv({
 ftpServer.on('login', ({ connection, username, password }, resolve, reject) => {
   if (username === process.env.FTP_AUTH_USERNAME && password === process.env.FTP_AUTH_PASSWORD) {
     resolve({ root: './data' }); // Root directory for authorized users
-    console.log(`User ${username} logged in`);
+    logFTP(`User ${username} logged in`, false);
   } else {
     reject(new Error('Invalid username or password')); // Reject if authentication fails
   }
@@ -51,10 +56,10 @@ ftpServer.on('login', ({ connection, username, password }, resolve, reject) => {
    // Event listener for file storage
   connection.on('STOR', (error, stream) => { 
     if(error){
-      console.error('Error storing file: ', error);
+      logFTP(`Error storing file: ${error}`, true);
       return;
     }
-    console.log(`File stored: ${stream}`);
+    logFTP(`File stored: ${stream}`, false);
 
     addSocomecDataFromStream(stream)
   });
@@ -63,19 +68,19 @@ ftpServer.on('login', ({ connection, username, password }, resolve, reject) => {
 // Event listener for disconnections
 ftpServer.on('disconnect', ({connection}) => {
   const username = connection.username;
-  console.log(`User ${username} disconnected`);
+  logFTP(`User ${username} disconnected`, false);
 });
 
 // Event listener for server errors
 ftpServer.on('error', (error) => {
-  console.error('FTP Server error:', error);
+  logFTP(`FTP Server error: ${error}`, true);
 });
 
 // Start the FTP server
 ftpServer.listen()
   .then(() => {
-      console.log('FTP server is running on port 21');
+    logFTP(`FTP server is running on port ${ftp_port}`, false);
   })
   .catch(error => {
-    console.error(`Error starting FTP server: ${error.message}`);
+    logFTP(`Error starting FTP server: ${error.message}`, true);
   });

@@ -26,7 +26,7 @@ const getAllSocomecData = async (request, response) => {
       });
   } catch (error) {
       // Log the error and send a 500 response with an error message
-      logServer(error, true);
+      logFTP(error, true);
       response.status(500).send({
           success:false,
           message:'Error in Get All Socomec Data API',
@@ -66,7 +66,7 @@ const getAllDataBySocomecCircuit = async (request, response) => {
       });
   } catch (error) {
       // Log the error and send a 500 response with an error message
-      logServer(error, true);
+      logFTP(error, true);
       response.status(500).send({
           success:false,
           message:'Error in Get All Data By Socomec Circuit API',
