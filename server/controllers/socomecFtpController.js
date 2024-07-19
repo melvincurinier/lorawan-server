@@ -1,7 +1,7 @@
 // Import modules
 const fs = require('fs');
 const { parse } = require('csv-parse');
-const ftpService = require('../services/ftpService');
+const ftpService = require('../services/socomecFtpService');
 const { logFTP } = require('../util/coloredLog');
 
 /**

@@ -2,8 +2,7 @@
 const FtpSrv = require('ftp-srv');
 const { networkInterfaces } = require('os');
 const { Netmask } = require('netmask');
-const { addSocomecDataFromStream } = require('../controllers/ftpController');
-const fs = require('fs');
+const { addSocomecDataFromStream } = require('../controllers/socomecFtpController');
 
 /**
  * A function that get network interfaces and their addresses

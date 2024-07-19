@@ -1,6 +1,6 @@
 // Import modules
 const express = require('express');
-const { getAllSocomecData, getAllDataBySocomecCircuit } = require('../controllers/ftpController');
+const { getAllSocomecData, getAllDataBySocomecCircuit } = require('../controllers/socomecFtpController');
 
 // Router
 const router = express.Router();
@@ -12,7 +12,7 @@ const router = express.Router();
 router.get('/socomec', getAllSocomecData);
 
 // Route to get all data from a specific circuit by its name
-// This route will handle GET requests to '/sensors/:id'
+// This route will handle GET requests to '/socomec/:circuit'
 router.get('/socomec/:circuit', getAllDataBySocomecCircuit);
 
 // Export the router for use in the server
