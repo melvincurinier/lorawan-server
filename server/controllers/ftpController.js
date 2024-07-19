@@ -4,19 +4,90 @@ const { parse } = require('csv-parse');
 const ftpService = require('../services/ftpService');
 const { logFTP } = require('../util/coloredLog');
 
+/**
+ * A controller function (API) that get all data from circuits
+ */
+const getAllSocomecData = async (request, response) => {
+  try {
+      // Retrieve all socomec data from the database
+      const [data] = await ftpService.getAllSocomecDataFromDatabase();
+      if(!data){
+          // If no data is found, send a 404 response with a message
+          return response.status(404).send({
+              success:false,
+              message:'No Records found'
+          });
+      }
+      // Send a 200 response with the retrieved data
+      response.status(200).send({
+          success:true,
+          message:'All Socomec Records',
+          data : data
+      });
+  } catch (error) {
+      // Log the error and send a 500 response with an error message
+      logServer(error, true);
+      response.status(500).send({
+          success:false,
+          message:'Error in Get All Socomec Data API',
+          error
+      });
+  }
+};
+
+/**
+* A controller function (API) that get all data from a specific circuit by its name
+*/
+const getAllDataBySocomecCircuit = async (request, response) => {
+  try {
+      const socomecCircuit = request.params.circuit;
+      if(!socomecCircuit){
+          // If no Socomec Circuit is provided, send a 404 response with a message
+          return response.status(404).send({
+              success:false,
+              message:'Invalid Or Provide Socomec Circuit'
+          });
+      }
+
+      // Retrieve data by Socomec Circuit from the database
+      const [data] = await ftpService.getAllDataBySocomecCircuitFromDatabase(socomecCircuit);
+      if(!data){
+          // If no data is found, send a 404 response with a message
+          return response.status(404).send({
+              success:false,
+              message:'No Records found'
+          });
+      }
+      // Send a 200 response with the retrieved data
+      response.status(200).send({
+          success:true,
+          message:'All Data Records From Socomec Circuit',
+          circuitData : data
+      });
+  } catch (error) {
+      // Log the error and send a 500 response with an error message
+      logServer(error, true);
+      response.status(500).send({
+          success:false,
+          message:'Error in Get All Data By Socomec Circuit API',
+          error
+      });
+  }
+};
+
 const addSocomecDataFromStream = async (stream) => {
   const data = await parseCSV(stream);
   try {
     if (!data) {
         // If no data are provided, throw the error
-        throw new Error('Provide Sensor ID or Data');
+        throw new Error('Provide Sococec Circuit or Data');
     }
     if (!isValidSocomecData(data[0])) {
       // If the data does contain invalid data, throw the error
       throw new Error('Invalid data format');
     }
     
-    // Add the sensor data to the database
+    // Add the socomec data to the database
     for(const row of data){
       await ftpService.addSocomecDataToDatabase(row);
     }
@@ -79,4 +150,4 @@ const isValidSocomecData = (data) => {
 };
 
 // Export the functions for use in other modules
-module.exports = { addSocomecDataFromStream };
+module.exports = { getAllSocomecData, getAllDataBySocomecCircuit, addSocomecDataFromStream };

@@ -23,10 +23,9 @@ const getAllSensorsDataFromDatabase = async () => {
 const getAllDataBySensorIDFromDatabase = async (sensorId) => {
     // SQL query to select data from the sensor_data table where the sensor ID matches
     const query = 'SELECT * FROM sensor_data WHERE sensor_dev_addr=?';
-    const values = [sensorId];
     try {
         // Execute the query with the sensor ID as a parameter and return the result
-        const result = await mysqldb.query(query, values);
+        const result = await mysqldb.query(query, [sensorId]);
         return result;
     } catch (error) {
         // Throw an error if the query fails

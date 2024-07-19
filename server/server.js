@@ -30,7 +30,7 @@ app.use((error, request, response, next) => {
 })
 
 // Use the sensor routes for any routes starting with /api/v1
-app.use('/api/v1', require('./routes/sensorRoutes'));
+app.use('/api/v1', require('./routes/sensorRoutes'), require('./routes/socomecRoutes'));
 
 // Start the server and listen on the specified port
 app.listen(process.env.SERVER_PORT, () => {
