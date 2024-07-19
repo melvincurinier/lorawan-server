@@ -56,5 +56,9 @@ function logServer(message, error) {
     else coloredLog('SERVER >> ', message, 'yellow');
 }
 
+function logFTP(message, error){
+    if(error) coloredErrorLog('FTP >> ', message, 'red');
+    else coloredLog('FTP >> ', message, 'white');
+}
 // Export the logging functions for use in other modules
-module.exports = { logDatabase, logBroker, logServer };
+module.exports = { logDatabase, logBroker, logServer, logFTP };

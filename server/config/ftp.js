@@ -2,7 +2,8 @@
 const FtpSrv = require('ftp-srv');
 const { networkInterfaces } = require('os');
 const { Netmask } = require('netmask');
-const { parseCSV } = require('../controllers/ftpController');
+const { addSocomecDataFromStream } = require('../controllers/ftpController');
+const fs = require('fs');
 
 /**
  * A function that get network interfaces and their addresses
@@ -49,15 +50,14 @@ ftpServer.on('login', ({ connection, username, password }, resolve, reject) => {
   }
 
    // Event listener for file storage
-  connection.on('STOR', async (error, stream) => { 
+  connection.on('STOR', (error, stream) => { 
     if(error){
       console.error('Error storing file: ', error);
       return;
     }
     console.log(`File stored: ${stream}`);
 
-    await addSocomecDataFromStream(stream);
-    
+    addSocomecDataFromStream(stream)
   });
 });
 

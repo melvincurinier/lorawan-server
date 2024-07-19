@@ -2,6 +2,7 @@
 const fs = require('fs');
 const { parse } = require('csv-parse');
 const ftpService = require('../services/ftpService');
+const { logFTP } = require('../util/coloredLog');
 
 const addSocomecDataFromStream = async (stream) => {
   const data = await parseCSV(stream);
@@ -10,21 +11,28 @@ const addSocomecDataFromStream = async (stream) => {
         // If no data are provided, throw the error
         throw new Error('Provide Sensor ID or Data');
     }
-
-    if (!isValidSocomecData(data)) {
-        // If the data does contain invalid data, throw the error
-        throw new Error('Invalid data format');
+    if (!isValidSocomecData(data[0])) {
+      // If the data does contain invalid data, throw the error
+      throw new Error('Invalid data format');
     }
-
+    
     // Add the sensor data to the database
     for(const row of data){
       await ftpService.addSocomecDataToDatabase(row);
     }
-    logServer(`Data added to database`, false);
+    logFTP(`Data added to database`, false);
   } catch (error) {
       // Log the error if adding data to the database fails
-      logServer(error, true);
-      logServer('Data not added to database', true);
+      logFTP(error, true);
+      logFTP('Data not added to database', true);
+  } finally {
+    fs.unlink(stream, (error) => {
+      if (error) {
+        logFTP(`Error deleting file: ${error}`, true);
+        return;
+      }
+      logFTP('File deleted', false);
+    });
   }
 };
 
@@ -51,12 +59,12 @@ const parseCSV = (filePath) => {
       })
       // Event listener for the end of the stream
       .on('end', () => {
-        console.log('CSV file successfully processed');
+        logFTP('CSV file successfully processed', false);
         resolve(results);
       })
       // Event listener for errors
       .on('error', (error) => {
-        console.error(`Error reading CSV file: ${filePath}`, error);
+        logFTP(`Error reading CSV file: ${filePath}\nError: ${error}`, true);
         reject(error);
       });
   });
