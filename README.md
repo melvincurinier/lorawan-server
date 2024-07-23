@@ -1,6 +1,6 @@
 # LoRaWAN & FTP Server
 
-This project is a LoRaWAN & FTP Server handling an MQTT broker for real-time data communication of the lora sensors and others data sent by FTP . It uses Express for the REST API, MySQL for data storage, Aedes as the MQTT broker, FTP-SRV as the FTP server.
+This project is a LoRaWAN & FTP Server handling an MQTT broker for real-time data communication of the lora sensors and others data sent by FTP. It uses Express for the REST API, MySQL for data storage, Aedes as the MQTT broker, FTP-SRV as the FTP server.
 
 ## Table of Contents
 
@@ -26,8 +26,8 @@ Before you begin, ensure you have met the following requirements:
 
 1. Clone the repository:
     ```sh
-    git clone https://github.com/your-username/your-repo.git
-    cd your-repo
+    git clone https://github.com/melvincurinier/lorawan-server.git
+    cd lorawan-server
     ```
 
 2. Install the dependencies:
