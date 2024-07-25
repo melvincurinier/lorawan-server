@@ -3,6 +3,7 @@ const fs = require('fs');
 const { parse } = require('csv-parse');
 const ftpService = require('../services/socomecFtpService');
 const { logFTP } = require('../util/coloredLog');
+const path = require('path')
 
 /**
  * A controller function (API) that get all data from circuits
@@ -111,6 +112,8 @@ const addSocomecDataFromStream = async (stream) => {
  * A function that parse a CSV file and return the data.
  */
 const parseCSV = (filePath) => {
+  const fileName = path.basename(filePath);
+  const excludeDateTime = extractExcludeDateTime(fileName);
   return new Promise((resolve, reject) => {
     const results = []; // Array to hold the parsed data
 
@@ -126,7 +129,7 @@ const parseCSV = (filePath) => {
       }))
       // Event listener for each data row
       .on('data', (row) => {
-        results.push(row);
+        if(row['Local DateTime'] != excludeDateTime) results.push(row);
       })
       // Event listener for the end of the stream
       .on('end', () => {
@@ -148,6 +151,21 @@ const isValidSocomecData = (data) => {
   const requiredKeys = ['Data Key', 'Local DateTime', 'Value'];
   return requiredKeys.every(key => key in data);
 };
+
+/**
+ * A function that extract the last date of the filename
+ */
+function extractExcludeDateTime(filename) {
+  // Extract the part of the filename that contains the date and time
+  const parts = filename.split('_');
+  const date = parts[parts.length - 3]; // Date part
+  const time = parts[parts.length - 2].replace(/-/g, ':'); // Time part 
+  const excludeDateTime = date + 'T' + time;
+
+  // Formatting to match the format used in the CSV data
+  return excludeDateTime;
+}
+
 
 // Export the functions for use in other modules
 module.exports = { getAllSocomecData, getAllDataBySocomecCircuit, addSocomecDataFromStream };
