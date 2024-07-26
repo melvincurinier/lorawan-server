@@ -7,6 +7,9 @@ require('./config/mysql');
 // Initialize MQTT broker
 require('./config/broker');
 
+// Initialize FTP server
+require('./config/ftp');
+
 // Import modules
 const express = require('express');
 const mqtt = require('mqtt');
@@ -27,7 +30,7 @@ app.use((error, request, response, next) => {
 })
 
 // Use the sensor routes for any routes starting with /api/v1
-app.use('/api/v1', require('./routes/sensorRoutes'));
+app.use('/api/v1', require('./routes/sensorRoutes'), require('./routes/socomecFtpRoutes'));
 
 // Start the server and listen on the specified port
 app.listen(process.env.SERVER_PORT, () => {

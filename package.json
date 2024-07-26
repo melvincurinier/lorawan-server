@@ -1,7 +1,7 @@
 {
   "name": "server",
   "version": "1.0.0",
-  "description": "mysql mqtt nodejs server",
+  "description": "mysql mqtt nodejs ftp server",
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -11,11 +11,14 @@
   "license": "ISC",
   "dependencies": {
     "aedes": "^0.51.2",
+    "csv-parse": "^5.5.6",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
+    "ftp-srv": "^4.6.3",
     "mqtt": "^5.7.1",
     "mysql2": "^3.10.1",
     "net": "^1.0.2",
+    "netmask": "^2.0.2",
     "nodemon": "^3.1.3"
   }
 }

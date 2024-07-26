@@ -1,6 +1,6 @@
-# Sensor Network Server with MQTT Broker
+# LoRaWAN & FTP Server
 
-This project is a Network Server handling sensor data and an MQTT broker for real-time data communication. It uses Express for the REST API, MySQL for data storage, and Aedes as the MQTT broker.
+This project is a LoRaWAN & FTP Server handling an MQTT broker for real-time data communication of the lora sensors and others data sent by FTP. It uses Express for the REST API, MySQL for data storage, Aedes as the MQTT broker, FTP-SRV as the FTP server.
 
 ## Table of Contents
 
@@ -26,13 +26,12 @@ Before you begin, ensure you have met the following requirements:
 
 1. Clone the repository:
     ```sh
-    git clone https://github.com/your-username/your-repo.git
-    cd your-repo
+    git clone https://github.com/melvincurinier/lorawan-server.git
+    cd lorawan-server
     ```
 
 2. Install the dependencies:
     ```sh
-    cd ./server
     npm install
     ```
 
@@ -44,6 +43,10 @@ Before you begin, ensure you have met the following requirements:
     - `mysql2`: 3.10.1
     - `net`: 1.0.2
     - `nodemon`: 3.1.3
+    - `csv-parse`: 5.5.6,
+    - `ftp-srv`: 4.6.3,
+    - `net`: 1.0.2,
+    - `netmask`: 2.0.2,
 
 
 3. Set up the environment variables by creating a `.env` file in the root directory:
@@ -73,11 +76,17 @@ Before you begin, ensure you have met the following requirements:
     CONCURRENCY=10000
     QUEUE_LIMIT=100
     CONNECTION_TIMEOUT=30000
+
+    FTP_HOSTNAME=your_ftp_host
+    FTP_PORT=21
+    FTP_AUTH_USERNAME=your_ftp_username
+    FTP_AUTH_PASSWORD=your_ftp_password
     ```
 
 ## Configuration
 
 - `config/mysql.js`: Sets up the MySQL database connection.
+- `config/ftp.js`: Sets up the FTP server.
 - `config/broker.js`: Sets up the Aedes MQTT broker.
 
 ## Usage
@@ -117,6 +126,32 @@ Fetch data for a specific sensor by its ID.
 }
 ```
 
+### GET `/api/v1/socomec`
+
+Fetch all socomec data.
+
+#### Response:
+```json
+{
+    "success": true,
+    "message": "All Socomec Records",
+    "data": [...]
+}
+```
+
+### GET `/api/v1/socomec/:circuit`
+
+Fetch data for a specific circuit by its name.
+
+#### Response:
+```json
+{
+    "success": true,
+    "message": "All Data Records From Socomec Circuit",
+    "circuitData": [...]
+}
+```
+
 ## MQTT Integration
 
 The server connects to an MQTT broker and subscribes to a topic. It listens for messages and processes sensor data in real-time.
@@ -133,6 +168,7 @@ The application uses colored logging to differentiate between log types:
 - **Database Logs**: Green
 - **Broker Logs**: Cyan
 - **Server Logs**: Yellow
+- **FTP Logs**: White
 - **Error Logs**: Red
 
 ### Utility Functions:
@@ -140,6 +176,7 @@ The application uses colored logging to differentiate between log types:
 - `logDatabase`: Logs database-related messages.
 - `logBroker`: Logs broker-related messages.
 - `logServer`: Logs server-related messages.
+- `logFTP`: Logs FTP-related messages.
 
 ## Error Handling
 
