@@ -14,7 +14,7 @@ const mysqldb = mysql.createPool({
 /**
  * A function that check the database connection
  */
-async function checkConnection() {
+async function checkDbConnection() {
     try{
         // Attempt to get a connection from the pool
         const connection = await mysqldb.getConnection();
@@ -35,8 +35,5 @@ async function checkConnection() {
     }
 }
 
-// Check the status of database connection
-checkConnection();
-
 // Export the connection pool for use in other modules
-module.exports = mysqldb;
+module.exports = { mysqldb, checkDbConnection};

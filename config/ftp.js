@@ -1,9 +1,13 @@
+// Load environment variables from .env file
+require('dotenv').config();
+
 // Import modules
 const FtpSrv = require('ftp-srv');
 const { networkInterfaces } = require('os');
 const { Netmask } = require('netmask');
 const { addSocomecDataFromStream } = require('../controllers/socomecFtpController');
 const { logFTP } = require('../util/coloredLog');
+const { checkDbConnection } = require('./mysql');
 
 /**
  * A function that get network interfaces and their addresses
@@ -78,9 +82,12 @@ ftpServer.on('error', (error) => {
 
 // Start the FTP server
 ftpServer.listen()
-  .then(() => {
-    logFTP(`FTP server is running on port ${ftp_port}`, false);
-  })
-  .catch(error => {
-    logFTP(`Error starting FTP server: ${error.message}`, true);
-  });
+.then(() => {
+  logFTP(`FTP server is running on port ${ftp_port}`, false);
+})
+.catch(error => {
+  logFTP(`Error starting FTP server: ${error.message}`, true);
+});
+
+// Check the status of database connection
+checkDbConnection();

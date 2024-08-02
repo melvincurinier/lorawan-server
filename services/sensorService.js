@@ -1,5 +1,5 @@
 // Import the MySQL database configuration
-const mysqldb = require('../config/mysql');
+const { mysqldb } = require('../config/mysql');
 
 /**
  * A function that get all sensor data from the database

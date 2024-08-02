@@ -1,17 +1,12 @@
 // Load environment variables from .env file
 require('dotenv').config();
 
-// Initialize MySQL database connection
-require('./config/mysql')
-
-// Initialize FTP server
-require('./config/ftp');
-
 // Import modules
 const express = require('express');
 const mqtt = require('mqtt');
 const { addDataSensorByID } = require('./controllers/sensorController');
 const { logServer } = require('./util/coloredLog');
+const { checkDbConnection } = require('./config/mysql');
 
 // Rest object (Express application instance)
 const app = express();
@@ -33,6 +28,9 @@ app.use('/api/v1', require('./routes/sensorRoutes'), require('./routes/socomecFt
 app.listen(process.env.SERVER_PORT, () => {
     logServer(`Server ${process.env.SERVER_ID} running on port ${process.env.SERVER_PORT}`, false);
 });
+
+// Check the status of database connection
+checkDbConnection();
 
 // MQTT client options
 const options = {
