@@ -2,10 +2,7 @@
 require('dotenv').config();
 
 // Initialize MySQL database connection
-require('./config/mysql');
-
-// Initialize MQTT broker
-require('./config/broker');
+require('./config/mysql')
 
 // Initialize FTP server
 require('./config/ftp');

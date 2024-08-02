@@ -1,3 +1,6 @@
+// Load environment variables from .env file
+require('dotenv').config();
+
 // Import module
 const { logBroker } = require('../util/coloredLog');
 
@@ -31,9 +34,6 @@ function authenticateClient(client, username, password, callback){
 // Initialize the Aedes MQTT broker with configuration options
 const aedes = require('aedes')({
   id: process.env.AEDES_ID,
-  concurrency: process.env.CONCURRENCY || 10000,
-  queueLimit: process.env.QUEUE_LIMIT || 100,
-  connectTimeout: process.env.CONNECTION_TIMEOUT || 30000,
   authenticate: (client, username, password, callback) => {
     authenticateClient(client, username, password, callback);
   }
