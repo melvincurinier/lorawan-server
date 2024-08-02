@@ -86,6 +86,9 @@ const startFTPServer = () => {
   ftpServer.listen()
     .then(() => {
       console.log(`FTP server is running on port ${ftp_port}`);
+
+      // Check the status of database connection
+      checkDbConnection();
     })
     .catch(error => {
       console.error(`Error starting FTP server: ${error.message}`);
@@ -96,6 +99,3 @@ const startFTPServer = () => {
 
 // Start the FTP server for the first time
 startFTPServer();
-
-// Check the status of database connection
-checkDbConnection();

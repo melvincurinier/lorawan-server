@@ -57,8 +57,10 @@ aedes.on('unsubscribe', function (subscriptions, client) {
 })
 
 // Event emitted when a client publishes a message packet on the topic
-aedes.on('publish', function (packet, client) {if (client) {
-  console.log(`MESSAGE_PUBLISHED : MQTT Client ${(client ? client.id : 'AEDES BROKER_' + aedes.id)} has published message "${packet.payload}" on ${packet.topic} to aedes broker ${aedes.id}`)}
+aedes.on('publish', function (packet, client) {
+  if (client) {
+    console.log(`MESSAGE_PUBLISHED : MQTT Client ${(client ? client.id : 'AEDES BROKER_' + aedes.id)} has published message "${packet.payload}" on ${packet.topic} to aedes broker ${aedes.id}`);
+  }
 })
 
 const startServer = () => {

@@ -2,7 +2,6 @@
 const fs = require('fs');
 const { parse } = require('csv-parse');
 const ftpService = require('../services/socomecFtpService');
-const { logFTP } = require('../util/coloredLog');
 const path = require('path')
 
 /**
@@ -27,7 +26,7 @@ const getAllSocomecData = async (request, response) => {
       });
   } catch (error) {
       // Log the error and send a 500 response with an error message
-      logFTP(error, true);
+      console.error(`Error getting data: ${error}`);
       response.status(500).send({
           success:false,
           message:'Error in Get All Socomec Data API',
@@ -67,7 +66,7 @@ const getAllDataBySocomecCircuit = async (request, response) => {
       });
   } catch (error) {
       // Log the error and send a 500 response with an error message
-      logFTP(error, true);
+      console.error(`Error getting data: ${error}`);
       response.status(500).send({
           success:false,
           message:'Error in Get All Data By Socomec Circuit API',
@@ -92,18 +91,17 @@ const addSocomecDataFromStream = async (stream) => {
     for(const row of data){
       await ftpService.addSocomecDataToDatabase(row);
     }
-    logFTP(`Data added to database`, false);
+    console.log('Data added to database');
   } catch (error) {
       // Log the error if adding data to the database fails
-      logFTP(error, true);
-      logFTP('Data not added to database', true);
+      console.error(`Data not added to database: ${error}`);
   } finally {
     fs.unlink(stream, (error) => {
       if (error) {
-        logFTP(`Error deleting file: ${error}`, true);
+        console.error(`Error deleting file: ${error}`);
         return;
       }
-      logFTP('File deleted', false);
+      console.log('File deleted');
     });
   }
 };
@@ -133,12 +131,12 @@ const parseCSV = (filePath) => {
       })
       // Event listener for the end of the stream
       .on('end', () => {
-        logFTP('CSV file successfully processed', false);
+        console.log('CSV file successfully processed');
         resolve(results);
       })
       // Event listener for errors
       .on('error', (error) => {
-        logFTP(`Error reading CSV file: ${filePath}\nError: ${error}`, true);
+        console.error(`Error reading CSV file: ${error}`);
         reject(error);
       });
   });

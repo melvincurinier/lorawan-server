@@ -1,6 +1,5 @@
 // Import modules
 const sensorService = require('../services/sensorService');
-const { logServer } = require('../util/coloredLog');
 
 /**
  * A controller function (API) that get all data from sensors
@@ -24,7 +23,7 @@ const getAllSensorsData = async (request, response) => {
         });
     } catch (error) {
         // Log the error and send a 500 response with an error message
-        logServer(error, true);
+        console.error(`Error getting data: ${error}`);
         response.status(500).send({
             success:false,
             message:'Error in Get All Sensors Data API',
@@ -64,7 +63,7 @@ const getAllDataBySensorID = async (request, response) => {
         });
     } catch (error) {
         // Log the error and send a 500 response with an error message
-        logServer(error, true);
+        console.error(`Error getting data: ${error}`);
         response.status(500).send({
             success:false,
             message:'Error in Get All Data By Sensor ID API',
@@ -90,11 +89,10 @@ const addDataSensorByID = async (sensorId, data) => {
 
         // Add the sensor data to the database
         await sensorService.addDataSensorToDatabase(sensorId, data);
-        logServer(`Data added to database`, false);
+        console.log('Data added to database');
     } catch (error) {
         // Log the error if adding data to the database fails
-        logServer(error, true);
-        logServer('Data not added to database', true);
+        console.error(`Data not added to database: ${error}`);
     }
 };
 

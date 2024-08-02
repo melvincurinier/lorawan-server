@@ -1,6 +1,5 @@
 // Import modules
 const mysql = require('mysql2/promise');
-const { logDatabase } = require('../util/coloredLog');
 
 // Create a connection pool to the MySQL database
 const mysqldb = mysql.createPool({
@@ -18,19 +17,18 @@ async function checkDbConnection() {
     try{
         // Attempt to get a connection from the pool
         const connection = await mysqldb.getConnection();
-
-        logDatabase('Database connection established', false);
+        console.log('Database connection established', false);
 
         // Release the connection back to the pool
         connection.release();
     } catch (error) {
         // Handle specific connection errors and log appropriate messages
         if (error.code === 'PROTOCOL_CONNECTION_LOST') {
-            logDatabase('Database connection was closed', true);
+            console.error(`Database connection was closed: ${error}`);
         } else if (error.code === 'ER_CON_COUNT_ERROR') {
-            logDatabase('Database has too many connections', true);
+            console.error(`Database has too many connections: ${error}`);
         } else if (error.code === 'ECONNREFUSED') {
-            logDatabase('Database connection was refused', true);
+            console.error(`Database connection was refused: ${error}`);
         }
     }
 }
