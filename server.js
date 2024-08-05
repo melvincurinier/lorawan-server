@@ -72,7 +72,7 @@ const createMQTTClient = () => {
   // Event handler for incoming MQTT messages
   mqttClient.on("message", (topic, message) => {
     const now = new Date().toLocaleTimeString();
-    console.log(`MQTT Client Message ${now} - Topic: ${topic} - Message: ${message.toString()}`, false);
+    console.log(`MQTT Client Message ${now} - Topic: ${topic} - Message: ${message.toString()}`);
 
     // Split the topic to extract the channel
     const [ topicName, channel ] = topic.split('/');

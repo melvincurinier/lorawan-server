@@ -17,7 +17,7 @@ async function checkDbConnection() {
     try{
         // Attempt to get a connection from the pool
         const connection = await mysqldb.getConnection();
-        console.log('Database connection established', false);
+        console.log('Database connection established');
 
         // Release the connection back to the pool
         connection.release();

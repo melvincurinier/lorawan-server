@@ -33,21 +33,21 @@ const getAllSensorsData = async (request, response) => {
 };
 
 /**
- * A controller function (API) that get all data from a specific sensor by its ID
+ * A controller function (API) that get all data from a specific sensor by its dev addr
  */
 const getAllDataBySensorID = async (request, response) => {
     try {
-        const sensorId = request.params.id;
-        if(!sensorId){
-            // If no sensor ID is provided, send a 404 response with a message
+        const sensor = request.params.id;
+        if(!sensor){
+            // If no sensor dev addr is provided, send a 404 response with a message
             return response.status(404).send({
                 success:false,
-                message:'Invalid Or Provide Sensor ID'
+                message:'Invalid Or Provide Sensor dev addr'
             });
         }
 
-        // Retrieve sensor data by sensor ID from the database
-        const [data] = await sensorService.getAllDataBySensorIDFromDatabase(sensorId);
+        // Retrieve sensor data by sensor dev addr from the database
+        const [data] = await sensorService.getAllDataBySensorIDFromDatabase(sensor);
         if(!data){
             // If no data is found, send a 404 response with a message
             return response.status(404).send({
@@ -73,23 +73,33 @@ const getAllDataBySensorID = async (request, response) => {
 };
 
 /**
- * A controller function (No API) that add sensor data by sensor ID
+ * A controller function that add sensor data by sensor dev addr
  */
-const addDataSensorByID = async (sensorId, data) => {
+const addDataSensorByID = async (sensor, data) => {
     try {
-        if (!sensorId || !data) {
-            // If no sensor ID or data are provided, throw the error
-            throw new Error('Provide Sensor ID or Data');
+        if (!sensor || !data) {
+            // If no sensor dev addr or data are provided, throw the error
+            throw new Error('Provide Sensor dev addr or Data');
         }
 
-        if (!isValidSensorData(data)) {
+        var validSensorData;
+        var validBatVoltage;
+        if ( validSensorData = isValidSensorData(data)) {
+            // Add the sensor data to the database
+            await sensorService.addDataSensorToDatabase(sensor, data);
+            console.log('Data added to database');
+        }
+        if ( validBatVoltage = isBatVoltageSensorData(data)) {
+            var batV;
+            if(data['BatmV']) batV = data['BatmV'] / 1000;
+            else if(data['BatV']) batV = data['BatV'];
+            await sensorService.updateBatVoltageSensor(sensor,batV);
+            console.log('Battery voltage sensor updated');
+        } 
+        if (!validSensorData && !validBatVoltage) {
             // If the data does contain invalid data, throw the error
             throw new Error('Invalid data format');
         }
-
-        // Add the sensor data to the database
-        await sensorService.addDataSensorToDatabase(sensorId, data);
-        console.log('Data added to database');
     } catch (error) {
         // Log the error if adding data to the database fails
         console.error(`Data not added to database: ${error}`);
@@ -100,8 +110,16 @@ const addDataSensorByID = async (sensorId, data) => {
  * A function that validate if the data contains the required keys
  */
 const isValidSensorData = (data) => {
-    const requiredKeys = ['Hum_SHT', 'TempC_DS', 'TempC_SHT'];
+    const requiredKeys = ['Hum_SHT', 'TempC_DS'];
     return requiredKeys.every(key => key in data);
+};
+
+/**
+ * A function that validate if the data contains the required keys
+ */
+const isBatVoltageSensorData = (data) => {
+    const requiredKeys = ['BatV', 'BatmV'];
+    return requiredKeys.some(key => key in data);
 };
 
 // Export the controller functions for use in other modules
