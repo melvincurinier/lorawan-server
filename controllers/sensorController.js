@@ -91,7 +91,7 @@ const addDataSensorByID = async (sensor, data) => {
         }
         if ( validBatVoltage = isBatVoltageSensorData(data)) {
             var batV;
-            if(data['BatmV']) batV = data['BatmV'] / 1000;
+            if(data['Bat_V']) batV = data['Bat_V'];
             else if(data['BatV']) batV = data['BatV'];
             await sensorService.updateBatVoltageSensor(sensor,batV);
             console.log('Battery voltage sensor updated');
@@ -118,7 +118,7 @@ const isValidSensorData = (data) => {
  * A function that validate if the data contains the required keys
  */
 const isBatVoltageSensorData = (data) => {
-    const requiredKeys = ['BatV', 'BatmV'];
+    const requiredKeys = ['BatV', 'Bat_V'];
     return requiredKeys.some(key => key in data);
 };
 
