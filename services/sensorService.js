@@ -38,11 +38,15 @@ const getAllDataBySensorIDFromDatabase = async (sensor) => {
  */
 const addDataSensorToDatabase = async (sensor, data) => {
     // SQL query to insert new sensor data into the sensor_data table
-    const query = 'INSERT INTO sensor_data (sensor_dev_addr, tempC_SHT, hum_SHT, tempC_DS) VALUES (?, ?, ?, ?)';
+    const query = 'INSERT INTO sensor_data (sensor_dev_addr, tempC_SHT, hum_SHT, ext_value) VALUES (?, ?, ?, ?)';
     // Destructure the data object to extract individual data points
-    const { TempC_SHT, Hum_SHT, TempC_DS } = data;
+    const tempC_SHT = data['TempC_SHT'];
+    const hum_SHT = data['Hum_SHT'];
+    // Find the key of the external data sensor and extract it
+    const ext_key = findExtSensorKey(data);
+    const ext_value = data[ext_key];
     // Create an array of values to be inserted
-    const values = [sensor, TempC_SHT, Hum_SHT, TempC_DS];
+    const values = [sensor, tempC_SHT, hum_SHT, ext_value];
     try {
         // Execute the query with the values array and return the result
         const result = await mysqldb.query(query, values);
@@ -53,6 +57,9 @@ const addDataSensorToDatabase = async (sensor, data) => {
     }
 };
 
+/**
+ * A function that update sensor battery voltage to the database
+ */
 const updateBatVoltageSensor = async (sensor, batV) => {
     // SQL query to update battery voltage sensor into the sensor table
     const query = 'UPDATE sensor SET battery_voltage = ? WHERE dev_addr = ?';
@@ -67,6 +74,14 @@ const updateBatVoltageSensor = async (sensor, batV) => {
         throw error;
     }
 };
+
+/**
+ * A function that find the external sensor key in the data
+ */
+const findExtSensorKey = (data) => {
+    const extSensorKeys = ['TempC_DS'];
+    return extSensorKeys.find(key => key in data);
+}
 
 // Export the functions for use in other modules
 module.exports = { getAllSensorsDataFromDatabase, getAllDataBySensorIDFromDatabase, addDataSensorToDatabase, updateBatVoltageSensor };
