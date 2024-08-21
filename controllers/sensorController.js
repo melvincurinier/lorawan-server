@@ -75,7 +75,7 @@ const getAllDataBySensorID = async (request, response) => {
 /**
  * A controller function that add sensor data by sensor dev addr
  */
-const addDataSensorByID = async (sensor, data) => {
+const addDataSensorByID = async (sensor, data, time) => {
     try {
         if (!sensor || !data) {
             // If no sensor dev addr or data are provided, throw the error
@@ -84,12 +84,14 @@ const addDataSensorByID = async (sensor, data) => {
 
         var validSensorData;
         var validBatVoltage;
-        if ( validSensorData = isValidSensorData(data)) {
+        if ( validSensorData = isSensorDataTempAndHum(data)) {
             // Add the sensor data to the database
             await sensorService.addDataSensorToDatabase(sensor, data);
             console.log('Data added to database');
+        } else if ( validSensorData = isSensorDataDoor(data)) {
+            await controlDoorSensor(sensor, data, time);
         }
-        if ( validBatVoltage = isBatVoltageSensorData(data)) {
+        if ( validBatVoltage = isSensorDataBatVoltage(data)) {
             var batV;
             if(data['Bat_V']) batV = data['Bat_V'];
             else if(data['BatV']) batV = data['BatV'];
@@ -106,18 +108,50 @@ const addDataSensorByID = async (sensor, data) => {
     }
 };
 
+const doorSensors = {};
+
+const controlDoorSensor = (sensor, data, time) => {
+    const timestamp = convertTimeIntoSeconds(time);
+    if(data['ALARM'] == 1){
+        doorSensors[sensor] = { state: 'open', timestamp: timestamp };
+        console.log(`Sensor ${sensor} : door open at ${time}`);
+    } else if (data['ALARM'] == 0) {
+        if (sensor in doorSensors && doorSensors[sensor].state == 'open') {
+            const duration = (timestamp - doorSensors[sensor].timestamp) + 2; // in seconds, +2 is for the alarm detection
+            console.log(`Sensor ${sensor} : door closed at ${time}, open duration ${duration} seconds`);
+
+            doorSensors[sensor] = { state: 'closed', timestamp: 0 };
+        } else {
+            console.log(`No opening recorded for door sensor ${sensor} before closing.`);
+        }
+    }
+}
+
+function convertTimeIntoSeconds(timestamp) {
+    const [ hours, minutes, seconds ] = timestamp.split(':').map(Number);
+    return hours * 3600 + minutes * 60 + seconds;
+}
+
 /**
- * A function that validate if the data contains the required keys
+ * A function that validate if the data contains the temperature and humidity sensor keys
  */
-const isValidSensorData = (data) => {
+const isSensorDataTempAndHum = (data) => {
     const requiredKeys = ['Hum_SHT', 'TempC_DS'];
     return requiredKeys.every(key => key in data);
 };
 
 /**
- * A function that validate if the data contains the required keys
+ * A function that validate if the data contains the door sensor keys
  */
-const isBatVoltageSensorData = (data) => {
+const isSensorDataDoor = (data) => {
+    const requiredKeys = ['LAST_DOOR_OPEN_DURATION','DOOR_OPEN_TIMES', 'ALARM'];
+    return requiredKeys.every(key => key in data);
+};
+
+/**
+ * A function that validate if the data contains the bat voltage sensor key
+ */
+const isSensorDataBatVoltage = (data) => {
     const requiredKeys = ['BatV', 'Bat_V'];
     return requiredKeys.some(key => key in data);
 };

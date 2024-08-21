@@ -81,7 +81,7 @@ const createMQTTClient = () => {
     const data = JSON.parse(message.toString());
 
     // Add the sensor data to the database
-    addDataSensorByID(channel, data);
+    addDataSensorByID(channel, data, now);
   });
 
   // Event handler for QoS 1 message acknowledgment
