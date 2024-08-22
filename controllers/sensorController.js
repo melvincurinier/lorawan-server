@@ -86,10 +86,11 @@ const addDataSensorByID = async (sensor, data, time) => {
         var validBatVoltage;
         if ( validSensorData = isSensorDataTempAndHum(data)) {
             // Add the sensor data to the database
-            await sensorService.addDataSensorToDatabase(sensor, data);
+            await sensorService.addTempHumDataSensorToDatabase(sensor, data);
             console.log('Data added to database');
         } else if ( validSensorData = isSensorDataDoor(data)) {
             await controlDoorSensor(sensor, data, time);
+            console.log('Data added to database');
         }
         if ( validBatVoltage = isSensorDataBatVoltage(data)) {
             var batV;
@@ -109,17 +110,29 @@ const addDataSensorByID = async (sensor, data, time) => {
 };
 
 const doorSensors = {};
+/**
+ * A function that control door sensor requests
+ */
+const controlDoorSensor = async (sensor, data, time) => {
+    const timestamp = convertTimeIntoSeconds(time.hour);
 
-const controlDoorSensor = (sensor, data, time) => {
-    const timestamp = convertTimeIntoSeconds(time);
+    // Check if the alarm indicates the door is open
     if(data['ALARM'] == 1){
+        // Record the door's state as 'open' and store the timestamp of when it was opened
         doorSensors[sensor] = { state: 'open', timestamp: timestamp };
-        console.log(`Sensor ${sensor} : door open at ${time}`);
-    } else if (data['ALARM'] == 0) {
-        if (sensor in doorSensors && doorSensors[sensor].state == 'open') {
-            const duration = (timestamp - doorSensors[sensor].timestamp) + 2; // in seconds, +2 is for the alarm detection
-            console.log(`Sensor ${sensor} : door closed at ${time}, open duration ${duration} seconds`);
+        console.log(`Sensor ${sensor} : door open at ${time.hour}`);
+    } else if (data['ALARM'] == 0) { // Check if the alarm indicates the door is closed
+        if (sensor in doorSensors && doorSensors[sensor].state == 'open') { // Check if the door was previously recorded as open
+            // Calculate the duration the door was open
+            // Add 2 seconds to account for alarm detection delay
+            const duration = (timestamp - doorSensors[sensor].timestamp) + 2;
+            console.log(`Sensor ${sensor} : door closed at ${time.hour}, open duration ${duration} seconds`);
+            
+            // Prepare the data to be saved in the database, including duration and current time
+            const data = [duration, time];
+            await sensorService.addDoorDataSensorToDatabase(sensor, data);
 
+            // Update the door's state to 'closed' and reset the timestamp
             doorSensors[sensor] = { state: 'closed', timestamp: 0 };
         } else {
             console.log(`No opening recorded for door sensor ${sensor} before closing.`);
@@ -127,6 +140,9 @@ const controlDoorSensor = (sensor, data, time) => {
     }
 }
 
+/**
+ * A function that convert time into seconds
+ */
 function convertTimeIntoSeconds(timestamp) {
     const [ hours, minutes, seconds ] = timestamp.split(':').map(Number);
     return hours * 3600 + minutes * 60 + seconds;
