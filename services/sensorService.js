@@ -101,7 +101,7 @@ const updateBatVoltageSensor = async (sensor, batV) => {
  * A function that find the external sensor key in the data
  */
 const findExtSensorKey = (data) => {
-    const extSensorKeys = ['TempC_DS'];
+    const extSensorKeys = ['TempC_DS', 'TempC1'];
     return extSensorKeys.find(key => key in data);
 }
 

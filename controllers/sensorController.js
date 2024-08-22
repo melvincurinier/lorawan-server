@@ -152,7 +152,7 @@ function convertTimeIntoSeconds(timestamp) {
  * A function that validate if the data contains the temperature and humidity sensor keys
  */
 const isSensorDataTempAndHum = (data) => {
-    const requiredKeys = ['Hum_SHT', 'TempC_DS'];
+    const requiredKeys = ['Hum_SHT', 'TempC_SHT'];
     return requiredKeys.every(key => key in data);
 };
 
