@@ -4,7 +4,7 @@ const { mysqldb } = require('../config/mysql');
 /**
  * A function that get all temperature and humidity sensor data from the database
  */
-const getAllSensorsDataFromDatabase = async () => {
+const getAllTempHumSensorsDataFromDatabase = async () => {
     // SQL query to select all data from the sensor_data table
     const query = 'SELECT * FROM sensor_temp_hum_data';
     try {
@@ -20,7 +20,7 @@ const getAllSensorsDataFromDatabase = async () => {
 /**
  * A function that get all temperature and humidity data by sensor dev addr from the database
  */
-const getAllDataBySensorIDFromDatabase = async (sensor) => {
+const getAllTempHumDataBySensorIDFromDatabase = async (sensor) => {
     // SQL query to select data from the sensor_data table where the sensor dev addr matches
     const query = 'SELECT * FROM sensor_temp_hum_data WHERE sensor_dev_addr=?';
     try {
@@ -106,4 +106,10 @@ const findExtSensorKey = (data) => {
 }
 
 // Export the functions for use in other modules
-module.exports = { getAllSensorsDataFromDatabase, getAllDataBySensorIDFromDatabase, addTempHumDataSensorToDatabase, addDoorDataSensorToDatabase, updateBatVoltageSensor };
+module.exports = { 
+    getAllTempHumSensorsDataFromDatabase, 
+    getAllTempHumDataBySensorIDFromDatabase, 
+    addTempHumDataSensorToDatabase, 
+    addDoorDataSensorToDatabase, 
+    updateBatVoltageSensor 
+};

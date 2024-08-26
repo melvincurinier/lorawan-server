@@ -7,7 +7,7 @@ const sensorService = require('../services/sensorService');
 const getAllSensorsData = async (request, response) => {
     try {
         // Retrieve all sensor data from the database
-        const [data] = await sensorService.getAllSensorsDataFromDatabase();
+        const [data] = await sensorService.getAllTempHumSensorsDataFromDatabase();
         if(!data){
             // If no data is found, send a 404 response with a message
             return response.status(404).send({
@@ -47,7 +47,7 @@ const getAllDataBySensorID = async (request, response) => {
         }
 
         // Retrieve sensor data by sensor dev addr from the database
-        const [data] = await sensorService.getAllDataBySensorIDFromDatabase(sensor);
+        const [data] = await sensorService.getAllTempHumDataBySensorIDFromDatabase(sensor);
         if(!data){
             // If no data is found, send a 404 response with a message
             return response.status(404).send({
