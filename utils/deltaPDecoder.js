@@ -8,6 +8,10 @@ const { parseDeltap0x54Frame } = require('./deltaPFrame/0x54parser');
 const { parseDeltap0x55Frame } = require('./deltaPFrame/0x55parser');
 const { parseDeltap0x56Frame } = require('./deltaPFrame/0x56parser');
 
+/**
+ * Function that decode Delta P sensor frames
+ * Created using https://github.com/bkkIoT/iotAdeunis/tree/master/src/demo/products/deltap
+ */
 function decodeDeltaPFrame(payload) {
     const bytes = Buffer.from(payload, 'hex');
     const frame = {};
@@ -58,14 +62,10 @@ function decodeDeltaPFrame(payload) {
             break;
         default:
             frame.type = 'Unknown';
-            frame.payload = bytes.slice(2);
             break;
     }
 
     return frame;
 }
 
-// Exemple d'utilisation
-const hexString = "1000000c00010002012c";
-const decodedFrame = decodeDeltaPFrame(hexString);
-console.log(decodedFrame);
+module.exports = { decodeDeltaPFrame };

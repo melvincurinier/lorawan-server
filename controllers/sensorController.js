@@ -1,5 +1,6 @@
 // Import modules
 const sensorService = require('../services/sensorService');
+const { decodeDeltaPFrame } = require('../utils/deltaPDecoder');
 
 /**
  * A controller function (API) that get all data from sensors
@@ -91,6 +92,17 @@ const addDataSensorByID = async (sensor, data, time) => {
         } else if ( validSensorData = isSensorDataDoor(data)) {
             await controlDoorSensor(sensor, data, time);
             console.log('Data added to database');
+        } else if ( validSensorData = isSensorDataPayload(data)) {
+            const [result] = await sensorService.getModelBySensorID(sensor);
+            const model = result[0].model;
+            const payloadDecoded = decodePayloadBySensorModel(model, data);
+            if( model == 'DELTA P' && payloadDecoded['code'] == 83 ) {
+                await sensorService.addDeltaPressureSensorToDatabase(sensor, payloadDecoded);
+                console.log('Data added to database');
+            } else {
+                console.log('Data not added to database');
+            }
+
         }
         if ( validBatVoltage = isSensorDataBatVoltage(data)) {
             var batV;
@@ -164,6 +176,11 @@ const isSensorDataDoor = (data) => {
     return requiredKeys.every(key => key in data);
 };
 
+const isSensorDataPayload = (data) => {
+    const requiredKeys = ['rssi', 'payload', 'snr'];
+    return requiredKeys.every(key => key in data);
+}
+
 /**
  * A function that validate if the data contains the bat voltage sensor key
  */
@@ -171,6 +188,21 @@ const isSensorDataBatVoltage = (data) => {
     const requiredKeys = ['BatV', 'Bat_V'];
     return requiredKeys.some(key => key in data);
 };
+
+const decodePayloadBySensorModel = (model, data) => {
+    var content;
+    switch (model) {
+        case 'DELTA P':
+            content = JSON.stringify(decodeDeltaPFrame(data['payload']));
+            break;
+        default:
+            content = 'No decoding for this sensor';
+            break;
+    }
+
+    console.log(`Decoding payload : ${content}`);
+    return content;
+}
 
 // Export the controller functions for use in other modules
 module.exports = { getAllSensorsData, getAllDataBySensorID, addDataSensorByID};
