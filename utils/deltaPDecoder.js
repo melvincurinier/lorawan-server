@@ -4,6 +4,9 @@ const { parseDeltap0x1fFrame } = require('./deltaPFrame/0x1fparser');
 const { parseDeltap0x51Frame } = require('./deltaPFrame/0x51parser');
 const { parseDeltap0x52Frame } = require('./deltaPFrame/0x52parser');
 const { parseDeltap0x53Frame } = require('./deltaPFrame/0x53parser');
+const { parseDeltap0x54Frame } = require('./deltaPFrame/0x54parser');
+const { parseDeltap0x55Frame } = require('./deltaPFrame/0x55parser');
+const { parseDeltap0x56Frame } = require('./deltaPFrame/0x56parser');
 
 function decodeDeltaPFrame(payload) {
     const bytes = Buffer.from(payload, 'hex');
@@ -44,21 +47,15 @@ function decodeDeltaPFrame(payload) {
         case 0x53:
             Object.assign(frame, parseDeltap0x53Frame(bytes));
             break;
-
         case 0x54:
-            // Trame d'alarme Delta de pression
-            frame.type = 'Delta Pressure Alarm';
-            frame.deltaPressure = (bytes[2] << 8) | bytes[3];
-            frame.thresholdExceeded = (bytes[4] << 8) | bytes[5];
+            Object.assign(frame, parseDeltap0x54Frame(bytes));
             break;
-
         case 0x55:
-            // Trame d'alarme périodique capteur
-            frame.type = 'Sensor Alarm';
-            frame.sensorType = bytes[2];
-            frame.alarmCode = bytes[3];
+            Object.assign(frame, parseDeltap0x55Frame(bytes));
             break;
-
+        case 0x56:
+            Object.assign(frame, parseDeltap0x56Frame(bytes));
+            break;
         default:
             frame.type = 'Unknown';
             frame.payload = bytes.slice(2);
@@ -69,6 +66,6 @@ function decodeDeltaPFrame(payload) {
 }
 
 // Exemple d'utilisation
-const hexString = "3008";
+const hexString = "1000000c00010002012c";
 const decodedFrame = decodeDeltaPFrame(hexString);
 console.log(decodedFrame);
