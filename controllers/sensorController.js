@@ -1,6 +1,7 @@
 // Import modules
 const sensorService = require('../services/sensorService');
 const { decodeDeltaPFrame } = require('../utils/deltaPDecoder');
+const { decodeLht65nFrame } = require('../utils/lht65nDecoder');
 
 /**
  * A controller function (API) that get all data from sensors
@@ -95,14 +96,16 @@ const addDataSensorByID = async (sensor, data, time) => {
         } else if ( validSensorData = isSensorDataPayload(data)) {
             const [result] = await sensorService.getModelBySensorID(sensor);
             const model = result[0].model;
-            const payloadDecoded = decodePayloadBySensorModel(model, data);
-            if( model == 'DELTA P' && payloadDecoded['code'] == 83 ) {
-                await sensorService.addDeltaPressureSensorToDatabase(sensor, payloadDecoded);
+            data = decodePayloadBySensorModel(model, data);
+            if( model == 'DELTA P' && data['code'] == 83 ) {
+                await sensorService.addDeltaPressureSensorToDatabase(sensor, data);
+                console.log('Data added to database');
+            } else if ( model == 'LHT65N' ) {
+                await sensorService.addTempHumDataSensorToDatabase(sensor, data);
                 console.log('Data added to database');
             } else {
                 console.log('Data not added to database');
             }
-
         }
         if ( validBatVoltage = isSensorDataBatVoltage(data)) {
             var batV;
@@ -111,7 +114,7 @@ const addDataSensorByID = async (sensor, data, time) => {
             await sensorService.updateBatVoltageSensor(sensor,batV);
             console.log('Battery voltage sensor updated');
         } 
-        if (!validSensorData && !validBatVoltage) {
+        if (!validSensorData || !validBatVoltage) {
             // If the data does contain invalid data, throw the error
             throw new Error('Invalid data format');
         }
@@ -193,14 +196,17 @@ const decodePayloadBySensorModel = (model, data) => {
     var content;
     switch (model) {
         case 'DELTA P':
-            content = JSON.stringify(decodeDeltaPFrame(data['payload']));
+            content = decodeDeltaPFrame(data['payload']);
+            break;
+        case 'LHT65N':
+            content = decodeLht65nFrame(data['payload']);
             break;
         default:
             content = 'No decoding for this sensor';
             break;
     }
 
-    console.log(`Decoding payload : ${content}`);
+    console.log(`Decoding payload : ${JSON.stringify(content)}`);
     return content;
 }
 
