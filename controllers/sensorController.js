@@ -120,7 +120,7 @@ const addDataSensorByID = async (sensor, data, time) => {
         }
     } catch (error) {
         // Log the error if adding data to the database fails
-        console.error(`Data not added to database: ${error}`);
+        console.error(`Data not added to database or Battery voltage not updated: ${error}`);
     }
 };
 
@@ -192,6 +192,9 @@ const isSensorDataBatVoltage = (data) => {
     return requiredKeys.some(key => key in data);
 };
 
+/**
+ * Function that decode any payload not decoded by sensor model
+ */
 const decodePayloadBySensorModel = (model, data) => {
     var content;
     switch (model) {
