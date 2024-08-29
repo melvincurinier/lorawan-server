@@ -106,21 +106,22 @@ const addDataSensorByID = async (sensor, data, time) => {
             } else {
                 console.log('Data not added to database');
             }
+        } else {
+            console.error('Data not added to database : invalid data format');
         }
+
         if ( validBatVoltage = isSensorDataBatVoltage(data)) {
             var batV;
             if(data['Bat_V']) batV = data['Bat_V'];
             else if(data['BatV']) batV = data['BatV'];
             await sensorService.updateBatVoltageSensor(sensor,batV);
             console.log('Battery voltage sensor updated');
-        } 
-        if (!validSensorData || !validBatVoltage) {
-            // If the data does contain invalid data, throw the error
-            throw new Error('Invalid data format');
+        } else {
+            console.error('Battery voltage not updated : No battery voltage data');
         }
     } catch (error) {
         // Log the error if adding data to the database fails
-        console.error(`Data not added to database or Battery voltage not updated: ${error}`);
+        console.error(`Data not added to database : ${error}`);
     }
 };
 
